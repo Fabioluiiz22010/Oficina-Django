@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Oficina Mecânica C&C{% endblock %}</title>
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+</head>
+<body>
+    <header>
+        <h1>Oficina Mecânica C&C</h1>
+        <nav>
+            <a href="/admin/">Admin</a>
+            <a href="/clientes/">Clientes</a>
+            <a href="/servicos/">Serviços</a>
+            <a href="/veiculos/">Veículos em Serviço</a>
+            <a href="/pecas/">Estoque de Peças</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Conteúdo das páginas será inserido aqui -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        &copy; 2025 Oficina Mecânica C&C
+    </footer>
+</body>
+</html>

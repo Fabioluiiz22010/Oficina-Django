@@ -1,0 +1,16 @@
+# Python
+*.pyc
+__pycache__/
+
+# Environment
+meuAmbVir/
+venv/
+
+# Django
+*.sqlite3
+*.log
+/staticfiles/
+
+# IDE
+.vscode/
+.idea/
