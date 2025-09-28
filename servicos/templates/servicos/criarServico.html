@@ -1,0 +1,39 @@
+{% extends "base/_base.html" %}
+{% block title %}
+    {% if servico %}Editar Serviço{% else %}Novo Serviço{% endif %}
+{% endblock %}
+{% block content %}
+
+    <h1 style="text-align: center;">
+        {% if servico %}Editar Serviço{% else %}Criar Novo Serviço{% endif %}
+    </h1>
+
+    {% if error_message %}
+        <p class="error-message" style="color: red; text-align: center;">{{ error_message }}</p>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <input type="text" id="descricao" name="descricao" value="{{ servico.descricao|default:'' }}" placeholder="Descrição do Serviço" required>
+            <label for="descricao">Descrição:</label>
+        </div>
+
+        <div class="form-group">
+            {# Input type="time" para tempo, com valor formatado #}
+            <input type="time" id="tempo" name="tempo" value="{{ tempo_formatado|default:'00:00:00' }}" step="1" required> {# step="1" para segundos #}
+            <label for="tempo">Tempo Estimado (HH:MM:SS):</label>
+        </div>
+
+        <div class="form-group">
+            <input type="number" id="preco" name="preco" value="{{ servico.preco|default:'' }}" placeholder="Preço do Serviço (R$)" step="0.01" required>
+            <label for="preco">Preço:</label>
+        </div>
+        
+        <div class="form-submit-group">
+            <button type="submit">Salvar Serviço</button>
+        </div>
+    </form>
+
+{% endblock %}

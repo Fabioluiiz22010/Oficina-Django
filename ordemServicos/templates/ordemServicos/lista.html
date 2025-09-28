@@ -1,0 +1,50 @@
+{% extends 'base/_base.html' %}
+{% block title %}Lista de Ordens de Serviço{% endblock %}
+{% block content %}
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Ordens de Serviço</h1>
+        <a href="{% url 'criarOrdem' %}">
+            <button type="button">Abrir Nova Ordem</button>
+        </a>
+    </div>
+
+    <hr>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Veículo</th>
+                <th>Serviço</th>
+                <th>Entrada</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ordem in ordens %}
+            <tr>
+                <td>{{ ordem.pk }}</td>
+                <td>{{ ordem.veiculo.placa }} ({{ ordem.veiculo.modelo }})</td>
+                <td>{{ ordem.servico.descricao }}</td>
+                <td>{{ ordem.dataEntrada|date:"d/m/Y" }}</td>
+                <td>R$ {{ ordem.valorTotal }}</td>
+                <td>
+                    {% if ordem.feito %}
+                        <span style="color: green; font-weight: bold;">CONCLUÍDO</span>
+                    {% else %}
+                        <span style="color: var(--color-accent); font-weight: bold;">EM SERVIÇO</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'editarOrdem' ordem.pk %}">Editar</a>
+                    <a href="{% url 'deletarOrdem' ordem.pk %}">Deletar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

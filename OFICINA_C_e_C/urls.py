@@ -16,8 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from clientes import views as clientes_views # Importar views para a Home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('clientes.urls')),  #INCLUI AS URLS DO APP CLIENTES
+    path('', clientes_views.homeView, name='home'), # CORREÇÃO: Mapeia a raiz para a nova HOME
+    path('clientes/', include('clientes.urls')), 
+    path('servicos/', include('servicos.urls')), 
+    path('veiculos/', include('veiculos.urls')), 
+    path('pecas/', include('pecas.urls')),       
+    path('ordemServicos/', include('ordemServicos.urls')),
 ]

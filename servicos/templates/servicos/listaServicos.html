@@ -1,0 +1,38 @@
+{% extends 'base/_base.html' %}
+{% block title %}Lista de Serviços{% endblock %}
+{% block content %}
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Lista de Serviços</h1>
+        <a href="{% url 'criarServico' %}">
+            <button type="button">Cadastrar Novo Serviço</button>
+        </a>
+    </div>
+
+    <hr>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Descrição</th>
+                <th>Tempo Estimado</th>
+                <th>Preço (Mão de Obra)</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servico in servicos %}
+            <tr>
+                <td>{{ servico.descricao }}</td>
+                <td>{{ servico.tempo }}</td>
+                <td>R$ {{ servico.preco }}</td>
+                <td>
+                    <a href="{% url 'editarServico' servico.pk %}">Editar</a>
+                    <a href="{% url 'deletarServico' servico.pk %}">Deletar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base/_base.html' %}
+{% block title %}Lista de Peças (Estoque){% endblock %}
+{% block content %}
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Estoque de Peças</h1>
+        <a href="{% url 'criarPeca' %}">
+            <button type="button">Cadastrar Nova Peça</button>
+        </a>
+    </div>
+
+    <hr>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Quantidade</th>
+                <th>Valor Unitário</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for peca in pecas %}
+            <tr>
+                <td>{{ peca.nome }}</td>
+                <td>{{ peca.quantidade }}</td>
+                <td>R$ {{ peca.valorUN }}</td>
+                <td>
+                    <a href="{% url 'editarPeca' peca.pk %}">Editar</a>
+                    <a href="{% url 'deletarPeca' peca.pk %}">Deletar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

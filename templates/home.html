@@ -1,0 +1,88 @@
+{% extends "base/_base.html" %}
+{% block title %}Dashboard da Oficina{% endblock %}
+{% block content %}
+
+    <h1 style="text-align: center; margin-bottom: 40px;">Dashboard de Gestão C&C</h1>
+
+    <div style="display: flex; justify-content: space-around; gap: 20px; text-align: center; margin-bottom: 50px;">
+        
+        <div style="flex: 1; padding: 20px; border: 1px solid var(--color-border);">
+            <h3 style="color: var(--color-accent); font-size: 2.5em; margin-bottom: 5px; margin-top: 0;">{{ ordens_abertas_count }}</h3>
+            <p style="text-transform: uppercase; font-weight: 600; font-size: 0.9em;">Ordens em Serviço</p>
+            <a href="{% url 'listaOrdens' %}" style="color: var(--color-primary-dark); text-decoration: none; font-size: 0.8em;">Gerenciar →</a>
+        </div>
+        
+        <div style="flex: 1; padding: 20px; border: 1px solid var(--color-border);">
+            <h3 style="color: var(--color-text); font-size: 2.5em; margin-bottom: 5px; margin-top: 0;">{{ total_clientes }}</h3>
+            <p style="text-transform: uppercase; font-weight: 600; font-size: 0.9em;">Clientes Cadastrados</p>
+            <a href="{% url 'listaClientes' %}" style="color: var(--color-primary-dark); text-decoration: none; font-size: 0.8em;">Gerenciar →</a>
+        </div>
+
+        <div style="flex: 1; padding: 20px; border: 1px solid var(--color-border);">
+            <h3 style="color: var(--color-text); font-size: 2.5em; margin-bottom: 5px; margin-top: 0;">{{ total_veiculos }}</h3>
+            <p style="text-transform: uppercase; font-weight: 600; font-size: 0.9em;">Veículos no Sistema</p>
+            <a href="{% url 'listaVeiculos' %}" style="color: var(--color-primary-dark); text-decoration: none; font-size: 0.8em;">Gerenciar →</a>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 style="margin-top: 40px;">Ordens em Andamento (Top 5)</h2>
+    
+    {% if ordens_em_servico %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Veículo</th>
+                <th>Cliente</th>
+                <th>Data Entrada</th>
+                <th>Total Estimado</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ordem in ordens_em_servico %}
+            <tr>
+                <td>{{ ordem.pk }}</td>
+                <td>{{ ordem.veiculo.placa }} ({{ ordem.veiculo.modelo }})</td>
+                <td>{{ ordem.veiculo.cliente.nome }}</td>
+                <td>{{ ordem.dataEntrada|date:"d/m/Y" }}</td>
+                <td>R$ {{ ordem.valorTotal }}</td>
+                <td><a href="{% url 'editarOrdem' ordem.pk %}">Detalhes</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="margin-top: 20px;">Nenhuma ordem de serviço está em andamento.</p>
+    {% endif %}
+
+    <h2 style="margin-top: 60px;">Alerta de Estoque Baixo</h2>
+    
+    {% if pecas_baixo_estoque %}
+    <table>
+        <thead>
+            <tr>
+                <th>Peça</th>
+                <th>Qtde Atual</th>
+                <th>Valor UN</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for peca in pecas_baixo_estoque %}
+            <tr>
+                <td style="color: var(--color-accent); font-weight: bold;">{{ peca.nome }}</td>
+                <td style="color: var(--color-accent); font-weight: bold;">{{ peca.quantidade }}</td>
+                <td>R$ {{ peca.valorUN }}</td>
+                <td><a href="{% url 'editarPeca' peca.pk %}">Reabastecer</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="margin-top: 20px;">Estoque de peças está em níveis saudáveis (acima de 10 unidades).</p>
+    {% endif %}
+
+{% endblock %}

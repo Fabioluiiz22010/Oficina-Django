@@ -1,0 +1,51 @@
+{% extends "base/_base.html" %}
+{% block title %}
+    {% if veiculo %}Editar Veículo{% else %}Novo Veículo{% endif %}
+{% endblock %}
+{% block content %}
+
+    <h1 style="text-align: center;">
+        {% if veiculo %}Editar Veículo{% else %}Cadastrar Novo Veículo{% endif %}
+    </h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <input type="text" id="placa" name="placa" value="{{ veiculo.placa|default:'' }}" placeholder="Ex: ABC1234" required>
+            <label for="placa">Placa:</label>
+        </div>
+
+        <div class="form-group">
+            <input type="text" id="marca" name="marca" value="{{ veiculo.marca|default:'' }}" placeholder="Ex: Ford, Fiat, VW" required>
+            <label for="marca">Marca:</label>
+        </div>
+
+        <div class="form-group">
+            <input type="text" id="modelo" name="modelo" value="{{ veiculo.modelo|default:'' }}" placeholder="Ex: Focus, Palio, Golf" required>
+            <label for="modelo">Modelo:</label>
+        </div>
+
+        <div class="form-group">
+            <input type="number" id="ano" name="ano" value="{{ veiculo.ano|default:'' }}" placeholder="Ano de Fabricação" min="1900" max="2099" required>
+            <label for="ano">Ano:</label>
+        </div>
+
+        <div class="form-group">
+            <select id="cliente" name="cliente" required>
+                <option value="">Selecione um Cliente</option>
+                {% for c in clientes %}
+                    <option value="{{ c.pk }}" {% if veiculo.cliente.pk == c.pk %}selected{% endif %}>
+                        {{ c.nome }} (CPF: {{ c.cpf }})
+                    </option>
+                {% endfor %}
+            </select>
+            <label for="cliente">Proprietário:</label>
+        </div>
+
+        <div class="form-submit-group">
+            <button type="submit">Salvar Veículo</button>
+        </div>
+    </form>
+
+{% endblock %}

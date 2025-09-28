@@ -1,0 +1,36 @@
+{% extends "base/_base.html" %}
+{% block title %}
+    {% if cliente %}Editar Cliente{% else %}Novo Cliente{% endif %}
+{% endblock %}
+{% block content %}
+
+    <h1 style="text-align: center;">
+        {% if cliente %}Editar Cliente{% else %}Cadastrar Novo Cliente{% endif %}
+    </h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <input type="text" id="nome" name="nome" value="{{ cliente.nome|default:'' }}" placeholder="Nome Completo" required>
+            <label for="nome">Nome:</label>
+        </div>
+
+        <div class="form-group">
+            <input type="text" id="cpf" name="cpf" value="{{ cliente.cpf|default:'' }}" 
+                   {% if cliente %}readonly style="background-color: #f0f0f0;"{% endif %} 
+                   placeholder="CPF do Cliente" required>
+            <label for="cpf">CPF:</label>
+        </div>
+
+        <div class="form-group">
+            <input type="email" id="email" name="email" value="{{ cliente.email|default:'' }}" placeholder="E-mail de Contato" required>
+            <label for="email">E-mail:</label>
+        </div>
+
+        <div class="form-submit-group">
+            <button type="submit">Salvar Cliente</button>
+        </div>
+    </form>
+
+{% endblock %}

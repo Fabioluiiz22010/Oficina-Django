@@ -3,26 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Oficina Mecânica C&C{% endblock %}</title>
-    
+
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4"> {# Aumentei o número da versão para forçar o cache #}
+
 </head>
 <body>
     <header>
-        <h1>Oficina Mecânica C&C</h1>
+        <div style="display: flex; align-items: center; gap: 15px;"> {# NOVO: Contêiner para a logo e título #}
+            <img src="{% static 'img/logo.png' %}" alt="Logo Oficina C&C" style="height: 40px;"> {# NOVO: Sua logo aqui #}
+            <h1>C&C AUTO SUPER</h1>
+        </div>
         <nav>
+            <a href="{% url 'home' %}">Dashboard</a>
             <a href="/admin/">Admin</a>
             <a href="/clientes/">Clientes</a>
             <a href="/servicos/">Serviços</a>
-            <a href="/veiculos/">Veículos em Serviço</a>
-            <a href="/pecas/">Estoque de Peças</a>
+            <a href="/veiculos/">Veículos</a>
+            <a href="/pecas/">Peças</a>
+            <a href="/ordemServicos/">Ordens de Serviço</a>
         </nav>
     </header>
 
     <main>
         {% block content %}
-        <!-- Conteúdo das páginas será inserido aqui -->
         {% endblock %}
     </main>
 

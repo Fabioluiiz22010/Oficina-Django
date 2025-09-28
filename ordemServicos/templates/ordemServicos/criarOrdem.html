@@ -1,0 +1,86 @@
+{% extends "base/_base.html" %}
+{% block title %}
+    {% if ordem %}Editar Ordem de Serviço{% else %}Nova Ordem de Serviço{% endif %}
+{% endblock %}
+{% block content %}
+
+    <h1 style="text-align: center;">
+        {% if ordem %}Editar Ordem de Serviço{% else %}Criar Nova Ordem de Serviço{% endif %}
+    </h1>
+
+    {% if error_message %}
+        <p class="error-message" style="color: red; text-align: center;">{{ error_message }}</p>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <select id="veiculo" name="veiculo" required>
+                <option value="">Selecione um Veículo</option>
+                {% for v in veiculos %}
+                    <option value="{{ v.pk }}" {% if ordem.veiculo.pk == v.pk %}selected{% endif %}>
+                        {{ v.placa }} ({{ v.modelo }} - Cliente: {{ v.cliente.nome }})
+                    </option>
+                {% endfor %}
+            </select>
+            <label for="veiculo">Veículo:</label>
+        </div>
+
+        <div class="form-group">
+            <input type="date" id="dataEntrada" name="dataEntrada" value="{{ ordem.dataEntrada|date:'Y-m-d'|default:'' }}" required>
+            <label for="dataEntrada">Data de Entrada:</label>
+        </div>
+
+        <div class="form-group">
+            <input type="date" id="dataSaida" name="dataSaida" value="{{ ordem.dataSaida|date:'Y-m-d'|default:'' }}">
+            <label for="dataSaida">Data de Saída (Opcional):</label>
+        </div>
+
+        <div class="form-group">
+            <input type="number" id="valorTotal" name="valorTotal" value="{{ ordem.valorTotal|default:'' }}" placeholder="Valor Total do Serviço (R$)" step="0.01" required>
+            <label for="valorTotal">Valor Total:</label>
+        </div>
+
+        <div class="form-group">
+            <input type="text" id="descricao" name="descricao" value="{{ ordem.descricao|default:'' }}" placeholder="Breve descrição dos serviços" required>
+            <label for="descricao">Descrição:</label>
+        </div>
+        
+        <div class="form-group checkbox-group">
+            <input type="checkbox" id="feito" name="feito" {% if ordem.feito %}checked{% endif %}>
+            <label for="feito">Serviço Concluído?</label>
+        </div>
+
+        <div class="form-group">
+            <select id="servicos" name="servicos" multiple size="5"> {# 'multiple' permite seleção de vários, 'size' controla altura #}
+                <option value="" disabled>Selecione os Serviços (Ctrl/Cmd + clique)</option>
+                {% for servico in servicos_disponiveis %}
+                    <option value="{{ servico.pk }}" 
+                            {% if servicos_selecionados_pk and servico.pk in servicos_selecionados_pk %}selected{% endif %}>
+                        {{ servico.nome }} (R$ {{ servico.valor|stringformat:"%.2f" }})
+                    </option>
+                {% endfor %}
+            </select>
+            <label for="servicos">Serviços Utilizados:</label>
+        </div>
+
+        <div class="form-group">
+            <select id="pecas" name="pecas" multiple size="5"> {# 'multiple' permite seleção de vários, 'size' controla altura #}
+                <option value="" disabled>Selecione as Peças (Ctrl/Cmd + clique)</option>
+                {% for peca in pecas_disponiveis %}
+                    <option value="{{ peca.pk }}"
+                            {% if pecas_selecionadas_pk and peca.pk in pecas_selecionadas_pk %}selected{% endif %}>
+                        {{ peca.nome }} (R$ {{ peca.valorUN|stringformat:"%.2f" }} - Estoque: {{ peca.quantidade }})
+                    </option>
+                {% endfor %}
+            </select>
+            <label for="pecas">Peças Utilizadas:</label>
+        </div>
+        
+        <div class="form-submit-group">
+            <button type="submit">Salvar Ordem de Serviço</button>
+        </div>
+    </form>
+
+{% endblock %}

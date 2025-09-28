@@ -1,0 +1,37 @@
+{% extends 'base/_base.html' %}
+{% block content %}
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Lista de Clientes</h1>
+        <a href="{% url 'criarCliente' %}">
+            <button type="button">Cadastrar Novo Cliente</button>
+        </a>
+    </div>
+
+    <hr>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Email</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr>
+                <td>{{ cliente.nome }}</td>
+                <td>{{ cliente.cpf }}</td>
+                <td>{{ cliente.email }}</td>
+                <td>
+                    <a href="{% url 'editarCliente' cliente.cpf %}">Editar</a>
+                    <a href="{% url 'deletarCliente' cliente.cpf %}">Deletar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
