@@ -12,14 +12,14 @@
     <header>
         <div style="display: flex; align-items: center; gap: 15px;"> {# NOVO: Contêiner para a logo e título #}
             <img src="{% static 'img/logo.png' %}" alt="Logo Oficina C&C" style="height: 40px;"> {# NOVO: Sua logo aqui #}
-            <h1>C&C AUTO SUPER</h1>
+            <h3>C&C AUTO SUPER</h3>
         </div>
         <nav>
             <a href="{% url 'home' %}">Dashboard</a>
             <a href="/admin/">Admin</a>
             <a href="/clientes/">Clientes</a>
-            <a href="/servicos/">Serviços</a>
             <a href="/veiculos/">Veículos</a>
+            <a href="/servicos/">Serviços</a>
             <a href="/pecas/">Peças</a>
             <a href="/ordemServicos/">Ordens de Serviço</a>
         </nav>
@@ -30,8 +30,5 @@
         {% endblock %}
     </main>
 
-    <footer>
-        &copy; 2025 Oficina Mecânica C&C
-    </footer>
 </body>
 </html>

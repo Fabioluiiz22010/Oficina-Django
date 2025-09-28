@@ -113,7 +113,7 @@ hr {
     margin: 50px 0;
 }
 
-div[style*="justify-content: space-between"] {
+.top-controls { /* Nova classe para o div de botões */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -197,7 +197,9 @@ form {
 .form-group input:focus + label,
 .form-group input:not(:placeholder-shown) + label,
 .form-group select:focus + label,
-.form-group select:not([value=""]) + label {
+.form-group select:not([value=""]) + label,
+.form-group textarea:focus + label, /* Adicionado para textarea */
+.form-group textarea:not(:placeholder-shown) + label { /* Adicionado para textarea */
     top: -10px;
     left: 10px;
     font-size: 0.75em;
@@ -210,7 +212,9 @@ input[type="text"],
 input[type="number"],
 input[type="email"],
 input[type="date"],
-select {
+input[type="time"], /* Adicionado type="time" */
+select,
+textarea { /* Adicionado textarea */
     width: 100%;
     padding: 15px;
     border: 1px solid #ccc;
@@ -223,12 +227,14 @@ select {
 }
 
 input:focus,
-select:focus {
+select:focus,
+textarea:focus { /* Adicionado textarea */
     border-color: var(--color-accent);
     box-shadow: 0 0 0 1px var(--color-accent);
 }
 
-input::placeholder {
+input::placeholder,
+textarea::placeholder { /* Adicionado textarea */
     color: transparent;
 }
 
@@ -302,6 +308,15 @@ td a {
 td a:hover {
     color: var(--color-accent);
     text-decoration: underline;
+}
+
+/* Estilos específicos para o Dashboard */
+.dashboard-cards-container { /* Nova classe para o div principal dos cards */
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    text-align: center;
+    margin-bottom: 50px;
 }
 
 .home-status-card {

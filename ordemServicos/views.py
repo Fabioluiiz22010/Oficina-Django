@@ -6,57 +6,79 @@ from pecas.models import Peca
 
 def listaOrdens(request):
     ordem_servicos = OrdemServico.objects.all()
-    context = {'ordem_servicos': ordem_servicos}
-    return render(request, 'ordemServicos/lista.html', context)
+    # CORREÇÃO: Passando a lista sob o nome 'ordens'
+    context = {'ordens': ordem_servicos} 
+    return render(request, 'ordemServicos/listaOrdens.html', context)
 
 def criarOrdem(request):
-    # Passa todos os dados necessários para o template
-    context = {
-        'veiculos': Veiculo.objects.all(), 
-        'servicos_disponiveis': Servico.objects.all(), 
-        'pecas_disponiveis': Peca.objects.all()
-    }
-
+    veiculos = Veiculo.objects.all()
+    servicos_disponiveis = Servico.objects.all() # Carrega todos os SERVIÇOS
+    pecas_disponiveis = Peca.objects.all()       # Carrega todas as PEÇAS
+    
     if request.method == 'POST':
-        # Pega os dados do formulário
-        veiculo_id = request.POST.get('veiculo')
-        servico_id = request.POST.get('servico') # Pega um único ID
-        kilometragem = request.POST.get('Kilometragem')
-        peca_ids = request.POST.getlist('pecas') # Pega a lista de IDs de peças
+        print("Requisição POST recebida para criarOrdem.")
 
-        # Valida se os campos principais foram enviados
-        if not (veiculo_id and servico_id and kilometragem):
-            context['error_message'] = 'Erro: Veículo, Serviço e Quilometragem são obrigatórios.'
-            return render(request, 'ordemServicos/criarOrdem.html', context)
+        veiculo_pk = request.POST.get('veiculo') # A PK do Veiculo é a placa
+        servico_id = request.POST.get('servico_principal') # Nome do campo no formulário
+        kilometragem = request.POST.get('Kilometragem') # Novo campo
+        dataSaida = request.POST.get('dataSaida')
+        feito = request.POST.get('feito') == 'on' # Campo boolean
+        valorTotal = request.POST.get('valorTotal') # Pode ser preenchido ou calculado
 
-        try:
-            # Busca os objetos no banco de dados
-            veiculo_obj = get_object_or_404(Veiculo, pk=veiculo_id)
-            servico_obj = get_object_or_404(Servico, pk=servico_id)
-            
-            # Cria a Ordem de Serviço com os objetos corretos
-            ordem_servico = OrdemServico.objects.create(
-                veiculo=veiculo_obj,
-                servico=servico_obj, # <--- Problema resolvido!
-                Kilometragem=kilometragem,
-                # O valorTotal pode ser calculado depois ou vir do form
-                # A dataEntrada é automática pelo model (auto_now_add=True)
-            )
+        peca_ids = request.POST.getlist('pecas') # Múltiplas peças
 
-            # Adiciona as peças selecionadas
-            if peca_ids:
-                ordem_servico.pecas.set(peca_ids)
+        print(f"Dados do formulário: Veiculo_PK={veiculo_pk}, Servico_ID={servico_id}, Kilometragem={kilometragem}, DataSaida={dataSaida}, Feito={feito}, ValorTotal={valorTotal}, Peca_IDs={peca_ids}")
 
-            # Se tudo deu certo, redireciona para a lista
-            return redirect('listaOrdens')
+        # Validação para os campos obrigatórios no modelo OrdemServico
+        # (veiculo, servico, Kilometragem são obrigatórios)
+        if veiculo_pk and servico_id and kilometragem: 
+            try:
+                veiculo = get_object_or_404(Veiculo, pk=veiculo_pk)
+                servico = get_object_or_404(Servico, pk=servico_id)
+                
+                ordem_servico = OrdemServico.objects.create(
+                    veiculo=veiculo,
+                    servico=servico, # Um único serviço
+                    Kilometragem=kilometragem, # Campo Kilometragem
+                    dataSaida=dataSaida if dataSaida else None,
+                    feito=feito,
+                    valorTotal=valorTotal if valorTotal else 0.00 # Usa default se vazio
+                )
 
-        except Exception as e:
-            # Se ocorrer qualquer outro erro, exibe a mensagem
-            context['error_message'] = f'Erro inesperado ao salvar: {e}'
+                # Associa as peças (Many-to-Many)
+                if peca_ids:
+                    pecas_selecionadas = Peca.objects.filter(pk__in=peca_ids)
+                    ordem_servico.pecas.set(pecas_selecionadas)
+                else:
+                    ordem_servico.pecas.clear() # Limpa se nenhuma peça for selecionada na criação
+
+                print("Ordem de Serviço criada com sucesso!")
+                return redirect('listaOrdens')
+            except Exception as e:
+                print(f"!!!! ERRO AO CRIAR ORDEM DE SERVIÇO: {e}")
+                context = {
+                    'veiculos': veiculos,
+                    'servicos_disponiveis': servicos_disponiveis,
+                    'pecas_disponiveis': pecas_disponiveis,
+                    'error_message': f'Erro ao cadastrar Ordem de Serviço: {e}. Verifique os dados.'
+                }
+                return render(request, 'ordemServicos/criarOrdem.html', context)
+        else:
+            context = {
+                'veiculos': veiculos,
+                'servicos_disponiveis': servicos_disponiveis,
+                'pecas_disponiveis': pecas_disponiveis,
+                'error_message': 'Por favor, preencha todos os campos obrigatórios (Veículo, Serviço Principal, Kilometragem).'
+            }
             return render(request, 'ordemServicos/criarOrdem.html', context)
     
-    # Se o método não for POST, apenas exibe o formulário
+    context = {
+        'veiculos': veiculos, 
+        'servicos_disponiveis': servicos_disponiveis, 
+        'pecas_disponiveis': pecas_disponiveis
+    }
     return render(request, 'ordemServicos/criarOrdem.html', context)
+
 
 def editarOrdem(request, pk):
     ordem = get_object_or_404(OrdemServico, pk=pk)
@@ -66,17 +88,36 @@ def editarOrdem(request, pk):
 
     if request.method == 'POST':
         ordem.veiculo = get_object_or_404(Veiculo, pk=request.POST.get('veiculo'))
-        ordem.dataEntrada = request.POST.get('dataEntrada')
+        ordem.servico = get_object_or_404(Servico, pk=request.POST.get('servico_principal')) # Nome do campo no formulário
+        ordem.Kilometragem = request.POST.get('Kilometragem')
         ordem.dataSaida = request.POST.get('dataSaida') if request.POST.get('dataSaida') else None
-        ordem.valorTotal = request.POST.get('valorTotal')
-        # <<<<<<<<<<<<<<<< REMOVIDO: ordem.descricao = request.POST.get('descricao') >>>>>>>>>>>>>>>>>>
         ordem.feito = request.POST.get('feito') == 'on'
+        ordem.valorTotal = request.POST.get('valorTotal') if request.POST.get('valorTotal') else 0.00
 
-        # ... (restante do código para associar serviços e peças) ...
+
+        peca_ids = request.POST.getlist('pecas')
+        if peca_ids:
+            pecas_selecionadas = Peca.objects.filter(pk__in=peca_ids)
+            ordem.pecas.set(pecas_selecionadas)
+        else:
+            ordem.pecas.clear()
 
         ordem.save()
         print(f"Ordem de Serviço PK={pk} editada com sucesso!")
         return redirect('listaOrdens')
+
+    # Para exibir os itens selecionados no formulário de edição (pré-seleção)
+    pecas_selecionadas_pk = [p.pk for p in ordem.pecas.all()]
+
+    context = {
+        'ordem': ordem, 
+        'veiculos': veiculos, 
+        'servicos_disponiveis': servicos_disponiveis, 
+        'pecas_disponiveis': pecas_disponiveis,
+        'pecas_selecionadas_pk': pecas_selecionadas_pk        
+    }
+    return render(request, 'ordemServicos/criarOrdem.html', context)
+
 def deletarOrdem(request, pk):
     ordem = get_object_or_404(OrdemServico, pk=pk)
     ordem.delete()
