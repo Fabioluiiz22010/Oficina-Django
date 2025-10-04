@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Veiculo
-from clientes.models import Cliente # Importe o modelo Cliente
-from ordemServicos.models import OrdemServico # Importar se necessário para outras views
-from pecas.models import Peca # Importar se necessário para outras views
-from servicos.models import Servico # Importar se necessário para outras views
+from clientes.models import Cliente
+from ordemServicos.models import OrdemServico
+from pecas.models import Peca
+from servicos.models import Servico
 
 
 def listaVeiculos(request):
@@ -22,13 +22,13 @@ def criarVeiculo(request):
         marca = request.POST.get('marca')
         modelo = request.POST.get('modelo')
         ano = request.POST.get('ano')
-        # <<<<<<<<<<<<<<<< REMOVIDO: cor = request.POST.get('cor') >>>>>>>>>>>>>>>>>>
+        
         cliente_id = request.POST.get('cliente')
         
-        # O print de debug também deve refletir a remoção da cor
+        
         print(f"Dados do formulário: Placa={placa}, Marca={marca}, Modelo={modelo}, Ano={ano}, Cliente_ID={cliente_id}")
         
-        # A validação agora é para os campos que realmente existem no modelo
+        
         if placa and marca and modelo and ano and cliente_id: 
             print("Todos os campos obrigatórios preenchidos. Tentando criar veículo...")
             try:
@@ -39,7 +39,7 @@ def criarVeiculo(request):
                     marca=marca,
                     modelo=modelo,
                     ano=ano,
-                    # <<<<<<<<<<<<<<<< REMOVIDO: cor=cor, >>>>>>>>>>>>>>>>>>
+                    
                     cliente=cliente
                 )
                 print("Veículo criado com sucesso!")
@@ -66,10 +66,10 @@ def editarVeiculo(request, pk):
         veiculo.marca = request.POST.get('marca')
         veiculo.modelo = request.POST.get('modelo')
         veiculo.ano = request.POST.get('ano')
-        # <<<<<<<<<<<<<<<< REMOVIDO: veiculo.cor = request.POST.get('cor') >>>>>>>>>>>>>>>>>>
+        
         cliente_id = request.POST.get('cliente')
         
-        if cliente_id: # Aqui você pode adicionar mais validação se quiser
+        if cliente_id: 
             try:
                 cliente = get_object_or_404(Cliente, pk=cliente_id)
                 veiculo.cliente = cliente

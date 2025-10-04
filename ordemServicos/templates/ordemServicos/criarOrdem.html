@@ -67,23 +67,94 @@
             <label for="feito">Serviço Concluído?</label>
         </div>
 
-        {# Seleção de Múltiplas Peças (ManyToManyField) #}
-        <div class="form-group">
-            <select id="pecas" name="pecas" multiple size="5">
-                <option value="" disabled>Selecione as Peças (Ctrl/Cmd + clique)</option>
+        <h2 style="margin-top: 30px; text-align: center;">Peças Utilizadas</h2>
+
+<div id="pecaListaContainer">
+    {% for pecaUsada in ordem.pecausada_set.all|default_if_none:'' %}
+        <div class="form-group peca-item">
+            <input type="hidden" name="pecaUsadaPk" value="{{ pecaUsada.pk }}">
+            
+            <label for="pecaId">Peça:</label>
+            <select name="pecaId" required>
+                <option value="">Selecione uma Peça</option>
                 {% for peca in pecas_disponiveis %}
-                    <option value="{{ peca.pk }}"
-                            {% if pecas_selecionadas_pk and peca.pk in pecas_selecionadas_pk %}selected{% endif %}>
-                        {{ peca.nome }} (R$ {{ peca.valorUN|stringformat:"%.2f" }} - Estoque: {{ peca.quantidade }})
+                    <option value="{{ peca.pk }}" {% if pecaUsada.peca.pk == peca.pk %}selected{% endif %}>
+                        {{ peca.nome }} (Estoque: {{ peca.quantidade }})
                     </option>
                 {% endfor %}
             </select>
-            <label for="pecas">Peças Utilizadas:</label>
+            
+            <label for="quantidadeUsada">Quantidade:</label>
+            <input type="number" name="quantidadeUsada" value="{{ pecaUsada.quantidadeUsada }}" min="1" required style="width: 100px; display: inline-block;">
+            
+            <button type="button" class="remover-peca-btn" style="margin-left: 10px;">Remover</button>
         </div>
+    {% empty %}
+        <div class="form-group peca-item" id="pecaModelo">
+            <input type="hidden" name="pecaUsadaPk" value="">
+            
+            <label for="pecaId">Peça:</label>
+            <select name="pecaId">
+                <option value="">Selecione uma Peça</option>
+                {% for peca in pecas_disponiveis %}
+                    <option value="{{ peca.pk }}">{{ peca.nome }} (Estoque: {{ peca.quantidade }})</option>
+                {% endfor %}
+            </select>
+            
+            <label for="quantidadeUsada">Quantidade:</label>
+            <input type="number" name="quantidadeUsada" value="1" min="1" style="width: 100px; display: inline-block;">
+            
+            <button type="button" class="remover-peca-btn" style="margin-left: 10px; display: none;">Remover</button>
+        </div>
+    {% endfor %}
+</div>
+
+<button type="button" id="adicionarPecaBtn" style="margin-top: 15px;">+ Adicionar Peça</button>
         
         <div class="form-submit-group">
             <button type="submit">Salvar Ordem de Serviço</button>
         </div>
     </form>
 
+
+
+
+
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('pecaListaContainer');
+    const modelo = document.getElementById('pecaModelo');
+    const addButton = document.getElementById('adicionarPecaBtn');
+    if (modelo) {
+        modelo.style.display = 'block';
+    }
+
+    function adicionarPeca() {
+        const linhaBase = container.lastElementChild;
+        const novaPecaItem = linhaBase.cloneNode(true);
+
+        novaPecaItem.querySelector('input[name="pecaUsadaPk"]').value = '';
+        novaPecaItem.querySelector('select[name="pecaId"]').value = ''; // Limpa a seleção
+        novaPecaItem.querySelector('input[name="quantidadeUsada"]').value = '1'; // Define como 1
+
+        const removeBtn = novaPecaItem.querySelector('.remover-peca-btn');
+        if (removeBtn) {
+            removeBtn.style.display = 'inline-block';
+        }
+
+        container.appendChild(novaPecaItem);
+        novaPecaItem.querySelector('.remover-peca-btn').addEventListener('click', function() {
+            novaPecaItem.remove();
+        });
+    }
+
+    addButton.addEventListener('click', adicionarPeca);
+    document.querySelectorAll('.remover-peca-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            button.closest('.peca-item').remove();
+        });
+    });
+});
+</script>
 {% endblock %}
